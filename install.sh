@@ -59,11 +59,16 @@ for cmd in curl unzip; do
 done
 
 # WebKitGTK 4.1 is the one real runtime dependency of a Tauri app on Linux.
-if command -v ldconfig >/dev/null 2>&1 && ! ldconfig -p 2>/dev/null | grep -q 'libwebkit2gtk-4\.1'; then
-  warn "the WebKitGTK 4.1 runtime was not found — VoxLeaf will not start without it:"
-  warn "    Debian/Ubuntu : sudo apt install libwebkit2gtk-4.1-0"
-  warn "    Fedora        : sudo dnf install webkit2gtk4.1"
-  warn "    Arch          : sudo pacman -S webkit2gtk-4.1"
+# (grep on a variable, not a pipe: `pipefail` + `grep -q` racing ldconfig's
+# SIGPIPE produces false negatives.)
+if command -v ldconfig >/dev/null 2>&1; then
+  ld_out="$(ldconfig -p 2>/dev/null || :)"
+  if ! grep -q 'libwebkit2gtk-4\.1' <<<"$ld_out"; then
+    warn "the WebKitGTK 4.1 runtime was not found — VoxLeaf will not start without it:"
+    warn "    Debian/Ubuntu : sudo apt install libwebkit2gtk-4.1-0"
+    warn "    Fedora        : sudo dnf install webkit2gtk4.1"
+    warn "    Arch          : sudo pacman -S webkit2gtk-4.1"
+  fi
 fi
 
 # ------------------------------------------------------------- download
@@ -80,8 +85,13 @@ curl -fSL --progress-bar -o "$TMP/$ZIP_NAME" "$URL" \
   || die "download failed — check the version tag at https://github.com/$REPO/releases"
 
 unzip -q "$TMP/$ZIP_NAME" -d "$TMP/pkg"
-PAYLOAD="$TMP/pkg/VoxLeaf-linux-x64-portable"
-[ -f "$PAYLOAD/$BIN_NAME" ] || die "unexpected archive layout"
+
+# Archives have shipped both flat (voxleaf at the root) and wrapped in a
+# top-level folder — find the binary wherever it lives instead of assuming.
+BIN_IN_ZIP="$(find "$TMP/pkg" -maxdepth 3 -type f -name "$BIN_NAME" | head -n1)"
+[ -n "$BIN_IN_ZIP" ] || die "unexpected archive layout: no '$BIN_NAME' inside the zip:
+$(find "$TMP/pkg" -maxdepth 2 | sed 's/^/    /')"
+PAYLOAD="$(dirname "$BIN_IN_ZIP")"
 
 # -------------------------------------------------------------- install
 mkdir -p "$BIN_DIR" "$ICON_DIR" "$APP_DIR"
@@ -111,9 +121,12 @@ command -v gtk-update-icon-cache >/dev/null 2>&1 \
 
 # --------------------------------------------------------------- finish
 say "VoxLeaf installed to $BIN_PATH"
-if ! printf '%s' "$PATH" | tr ':' '\n' | grep -qx "$BIN_DIR"; then
-  warn "$BIN_DIR is not on your PATH — add this to your shell profile:"
-  warn "    export PATH=\"\$HOME/.local/bin:\$PATH\""
-fi
+# `case` instead of a pipe: grep -q can exit on the first PATH entry and the
+# same pipefail/SIGPIPE race would print a bogus warning.
+case ":$PATH:" in
+  *":$BIN_DIR:"*) ;;
+  *)  warn "$BIN_DIR is not on your PATH — add this to your shell profile:"
+      warn "    export PATH=\"\$HOME/.local/bin:\$PATH\"" ;;
+esac
 say "Launch with:  $BIN_NAME     (or find 'VoxLeaf' in your app menu)"
 say "Uninstall:    curl -fsSL https://raw.githubusercontent.com/$REPO/main/install.sh | bash -s -- --uninstall"
