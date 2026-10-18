@@ -1,0 +1,28 @@
+# Example desktop entry for the Linux portable build.
+#
+# The .deb package installs its own entry automatically; this file is for the
+# portable zip. Two ways to use it:
+#
+#   Per-user  (no root):  cp voxleaf.desktop ~/.local/share/applications/
+#                         then edit Exec/Icon below to point at the unpacked
+#                         folder, e.g. Exec=/opt/voxleaf/voxleaf
+#
+#   System-wide (root):   put the voxleaf binary anywhere on $PATH (or in
+#                         /usr/local/bin), copy icon.png to /usr/share/icons/
+#                         hicolor/128x128/apps/voxleaf.png, then
+#                         sudo cp voxleaf.desktop /usr/share/applications/
+#
+# The Exec/Icon values below assume the binary is on your PATH and the icon
+# is installed under the standard hicolor theme.
+[Desktop Entry]
+Type=Application
+Name=VoxLeaf
+GenericName=Audiobook Library
+Comment=Read and listen to your own EPUB and audio library
+Exec=voxleaf
+Icon=voxleaf
+Terminal=false
+StartupNotify=true
+StartupWMClass=voxleaf
+Categories=AudioVideo;Audio;Literature;
+Keywords=audiobook;epub;books;tts;library;player;

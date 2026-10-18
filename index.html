@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="application-name" content="VoxLeaf" />
+    <meta
+      name="description"
+      content="Your self-hosted audiobook library. Search, organise chapters, and listen."
+    />
+    <link rel="icon" type="image/png" href="/icon.png" />
+    <title>VoxLeaf</title>
+    <script>
+      /* Applied before first paint so the chosen theme never flashes the default. */
+      (function () {
+        try {
+          var t = localStorage.getItem('voxleaf:theme');
+          if (t !== 'light' && t !== 'dark' && t !== 'system') {
+            t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+          }
+          var r =
+            t === 'system'
+              ? window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light'
+              : t;
+          document.documentElement.dataset.theme = r;
+        } catch (e) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-dvh antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
