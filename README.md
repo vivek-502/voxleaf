@@ -39,19 +39,27 @@ Download **`VoxLeaf_1.0.0_x64-setup.exe`** from the [latest release](https://git
 
 Prefer portable? Grab **`VoxLeaf-windows-x64-portable.zip`**, unzip it anywhere, and run `voxleaf.exe`.
 
-### Debian / Ubuntu
+### Linux (any distro)
 
-Download **`VoxLeaf_1.0.0_amd64.deb`** from the [latest release](https://github.com/vivek-502/voxleaf/releases/latest), then:
+One command — works on Debian, Ubuntu, Fedora, Arch, and everything in between. It downloads the portable build and installs it for your user, no root:
 
 ```bash
-sudo apt install ./VoxLeaf_1.0.0_amd64.deb
+curl -fsSL https://raw.githubusercontent.com/vivek-502/voxleaf/main/install.sh | bash
 ```
 
-(`apt` pulls in the WebKitGTK runtime automatically. On older distros without `apt`, `sudo dpkg -i` + `sudo apt-get -f install` does the same.)
+The script checks your architecture and the WebKitGTK runtime, tells you exactly what's missing if anything is, then installs:
 
-### Other Linux distros (portable)
+- `~/.local/bin/voxleaf` — the app
+- a start-menu entry ("VoxLeaf") in your app menu
 
-Download **`VoxLeaf-linux-x64-portable.zip`** from the [latest release](https://github.com/vivek-502/voxleaf/releases/latest):
+Pin a version, or remove it again:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vivek-502/voxleaf/main/install.sh | bash -s -- 1.0.0
+curl -fsSL https://raw.githubusercontent.com/vivek-502/voxleaf/main/install.sh | bash -s -- --uninstall
+```
+
+Prefer portable? Grab **`VoxLeaf-linux-x64-portable.zip`** from the [latest release](https://github.com/vivek-502/voxleaf/releases/latest):
 
 ```bash
 unzip VoxLeaf-linux-x64-portable.zip -d voxleaf
@@ -59,9 +67,9 @@ chmod +x voxleaf/voxleaf
 ./voxleaf/voxleaf
 ```
 
-The zip contains the binary, the app icon, and an example `.desktop` entry (`voxleaf.desktop`) with install instructions in its header comment, so you can add VoxLeaf to your app menu.
+The zip contains the binary, the app icon, and an example `.desktop` entry (`voxleaf.desktop`) with install instructions in its header comment, so you can add VoxLeaf to your app menu yourself.
 
-You'll need the WebKitGTK 4.1 runtime once per machine:
+VoxLeaf needs the WebKitGTK 4.1 runtime once per machine:
 
 | Distro | Package |
 | --- | --- |
@@ -91,8 +99,7 @@ npm run tauri build        # produce platform installers in target/release/bundl
 Useful variants:
 
 ```bash
-npm run tauri build -- --bundles deb       # Linux .deb only
-npm run tauri build -- --bundles nsis      # Windows installer only
+npm run tauri build -- --bundles nsis      # Windows installer only (from Windows/MinGW)
 cargo test -p voxleaf-core                 # 220+ Rust tests
 npm test                                   # frontend tests
 ```
