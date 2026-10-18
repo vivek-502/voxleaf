@@ -48,10 +48,6 @@ export function Sidebar() {
           ))}
         </ul>
       </nav>
-
-      <p className="mt-4 px-3 text-[11px] leading-relaxed text-ink-subtle">
-        Single-user app. No account, no sign-in — everything is stored locally.
-      </p>
     </aside>
   );
 }
