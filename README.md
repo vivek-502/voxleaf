@@ -142,6 +142,8 @@ The Tauri process embeds a local HTTP server (loopback only) that speaks the sam
 
 Store discovery and covers are provided by the wonderful free [Open Library API](https://openlibrary.org/developers/api). TTS uses Microsoft Edge's online neural voices.
 
+Windows releases of VoxLeaf use the SignPath Foundation for code signing. We thank the SignPath Foundation for supporting the distribution of trusted open-source software.
+
 ## License
 
 [MIT](LICENSE) — see [LICENSE](LICENSE).
