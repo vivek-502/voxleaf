@@ -12,14 +12,14 @@ A fast, fully-local desktop library for your EPUBs — built-in reader, chapter 
 - **Neural TTS** — on-demand text-to-speech narration
 - **Local-first** — everything runs on your machine; no cloud, no account
 - **Linux (.deb / portable) and Windows installers**
-- **One-line install:** `curl -fsSL https://raw.githubusercontent.com/vivek-502/voxleaf/master/install.sh | bash`
+- **One-line install:** `curl -fsSL https://raw.githubusercontent.com/vivek-502/voxleaf/main/install.sh | bash`
 
 ## Installation
 
 ### Linux (one-liner)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/vivek-502/voxleaf/master/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/vivek-502/voxleaf/main/install.sh | bash
 ```
 
 This downloads the latest portable binary, makes it executable, and leaves it as `./voxleaf`. Run it with `./voxleaf`.

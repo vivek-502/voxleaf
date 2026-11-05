@@ -1,6 +1,6 @@
 #!/bin/bash
 # VoxLeaf — one-line Linux installer
-# Usage: curl -fsSL https://raw.githubusercontent.com/vivek-502/voxleaf/master/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/vivek-502/voxleaf/main/install.sh | bash
 set -euo pipefail
 
 VERSION="${VOXLEAF_VERSION:-1.0.0}"
