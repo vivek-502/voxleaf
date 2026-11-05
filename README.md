@@ -30,6 +30,27 @@ Add `~/.local/bin` to your PATH to run `voxleaf` from any terminal:
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 ```
 
+#### Uninstall Linux
+
+Remove VoxLeaf but **keep your app data** (library, EPUB database, settings) at `~/.local/share/voxleaf`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vivek-502/voxleaf/main/install.sh | bash -s -- --uninstall
+```
+
+Remove VoxLeaf **including all app data** (library, EPUB database, settings):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vivek-502/voxleaf/main/install.sh | bash -s -- --uninstall --purge
+```
+
+The uninstaller removes:
+- `~/.local/bin/voxleaf`
+- `~/.local/share/applications/voxleaf.desktop`
+- `~/.local/share/icons/hicolor/256x256/apps/voxleaf.png`
+
+With `--purge`, it also removes `~/.local/share/voxleaf`.
+
 ### Linux (manual)
 
 Download `voxleaf-<version>-x86_64-linux` from the [Releases](https://github.com/vivek-502/voxleaf/releases) page:
