@@ -1,0 +1,37 @@
+# VoxLeaf — gitignore
+
+# Rust / Cargo
+/target/
+/Cargo.lock.orig
+*.rs.bak
+
+# Frontend / Node
+/node_modules/
+/dist/
+/frontend-placeholder/
+.npm/
+.vite/
+
+# Environment & logs
+.env
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts / release binaries (attached to GitHub releases instead)
+/release/
+*.exe
+*.deb
+*.msi
+*.dmg
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

@@ -1,0 +1,843 @@
+/* The desktop app lives inside a much larger git worktree, and this project
+   has no `.gitignore` of its own. Tailwind v4's automatic source detection
+   would therefore walk the whole workspace — including `target/` and the web
+   app — which costs gigabytes of memory and minutes per build. The app's
+   classes all live in `src` and `index.html`, so scope detection to them. */
+@import 'tailwindcss' source(none);
+@source '../**/*.{ts,tsx}';
+@source '../../index.html';
+
+/* -------------------------------------------------------------------------- */
+/* Typefaces                                                                  */
+/*                                                                            */
+/* Self-hosted so the app renders identically offline. Fraunces carries the    */
+/* editorial voice, Inter Tight handles interface text, and IBM Plex Mono is   */
+/* reserved for timecodes, chapter numbers and small metadata.                 */
+/* -------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/fonts/fraunces-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Fraunces';
+  font-style: italic;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/fonts/fraunces-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter Tight';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/inter-tight.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter Tight';
+  font-style: italic;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('/fonts/inter-tight-italic.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/plex-mono-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/plex-mono-500.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Design tokens                                                              */
+/*                                                                            */
+/* The default theme is paper: warm off-white stock, near-black ink and a      */
+/* single rust accent, in the manner of a small-press title page. Dark mode is */
+/* the same setting after dark — not an inversion, but lamp-lit stock.         */
+/* -------------------------------------------------------------------------- */
+
+@theme {
+  --color-canvas: #f3efe6;
+  --color-surface: #faf6ee;
+  --color-raised: #fffcf5;
+  --color-overlay: #ebe4d6;
+  --color-hairline: #d9d0bd;
+  --color-hairline-strong: #b9ac93;
+
+  --color-ink: #1c1914;
+  --color-ink-muted: #5d5548;
+  --color-ink-subtle: #6f6553;
+
+  --color-accent: #a63d25;
+  --color-accent-deep: #7b2a16;
+  --color-accent-wash: rgb(166 61 37 / 0.08);
+  --color-accent-line: rgb(166 61 37 / 0.32);
+
+  --color-positive: #3c6549;
+  --color-caution: #7d560c;
+  --color-danger: #a3362a;
+
+  --font-sans:
+    'Inter Tight', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+  --font-display: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-serif: 'Fraunces', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+
+  --radius-card: 4px;
+  --radius-panel: 8px;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --shadow-card: 0 1px 0 rgb(28 25 20 / 0.04);
+  --shadow-lift: 0 18px 40px -28px rgb(28 25 20 / 0.4);
+  --shadow-player: 0 -1px 0 rgb(28 25 20 / 0.08);
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --color-canvas: #14120f;
+  --color-surface: #1a1815;
+  --color-raised: #201d19;
+  --color-overlay: #29251f;
+  --color-hairline: #352f27;
+  --color-hairline-strong: #4d4538;
+
+  --color-ink: #f2ebde;
+  --color-ink-muted: #b1a592;
+  --color-ink-subtle: #9a8f7d;
+
+  --color-accent: #e07048;
+  --color-accent-deep: #b84427;
+  --color-accent-wash: rgb(224 112 72 / 0.12);
+  --color-accent-line: rgb(224 112 72 / 0.34);
+
+  --color-positive: #7ba98a;
+  --color-caution: #d3a44e;
+  --color-danger: #e08074;
+
+  --shadow-card: 0 1px 0 rgb(0 0 0 / 0.3);
+  --shadow-lift: 0 22px 50px -30px rgb(0 0 0 / 0.9);
+  --shadow-player: 0 -1px 0 rgb(242 235 222 / 0.08);
+}
+
+:root {
+  color-scheme: light;
+  /* Space for the persistent mini-player, so content is never hidden. */
+  --mini-player-height: 0px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Base                                                                       */
+/* -------------------------------------------------------------------------- */
+
+@layer base {
+  * {
+    border-color: var(--color-hairline);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01', 'cv05';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* A whisper of paper grain; flat colour reads as a screen, grain reads as stock. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.035'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    min-height: 100dvh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.018em;
+    text-wrap: balance;
+    font-optical-sizing: auto;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* One consistent, always-visible focus ring. Never removed. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-raised);
+  }
+
+  /* Slim, themed scrollbars. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-hairline-strong) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--color-hairline-strong);
+    border-radius: 0;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-accent-line);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Utilities                                                                  */
+/* -------------------------------------------------------------------------- */
+
+@utility container-page {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 1360px;
+  padding-inline: 1.25rem;
+  @media (width >= 768px) {
+    padding-inline: 2rem;
+  }
+  @media (width >= 1280px) {
+    padding-inline: 3rem;
+  }
+}
+
+/* The masthead's small, tracked, uppercase label. */
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-ink-subtle);
+}
+
+/* A ruled section opener. */
+@utility section-rule {
+  border-block-start: 1px solid var(--color-ink);
+}
+
+/* Hide content visually but keep it for screen readers. */
+@utility sr-only-focusable {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@utility line-clamp-2-safe {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@utility line-clamp-3-safe {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Skeleton shimmer for loading states. */
+@utility skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-overlay);
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--color-hairline-strong) 55%, transparent),
+      transparent
+    );
+    animation: shimmer 1.6s infinite;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* The contents panel. Docked it fades, because sliding a column that the text is
+   already sitting beside would look like a mistake; as a drawer it comes in
+   from the edge it is anchored to. */
+@keyframes contents-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes contents-slide {
+  from {
+    opacity: 0;
+    transform: translate3d(-1rem, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes scrim-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Equal-height grid rows so cards line up regardless of title length. */
+@utility grid-auto-rows {
+  grid-auto-rows: 1fr;
+}
+
+/* -------------------------------------------------------------------------- */
+/* EPUB reader                                                                */
+/*                                                                            */
+/* The reader owns its own palette rather than reusing app tokens, because     */
+/* reading surfaces need paper-like backgrounds and pure text contrast, which   */
+/* the artwork-first app chrome deliberately does not use. Scoped to           */
+/* `[data-reader-theme]` so it never leaks into the rest of the app.           */
+/* -------------------------------------------------------------------------- */
+
+[data-reader-theme='paper'] {
+  color-scheme: light;
+  --reader-bg: #f1ebde;
+  --reader-sheet: #fffdf7;
+  --reader-fg: #1c1914;
+  --reader-muted: #6b6153;
+  --reader-link: #a63d25;
+  --reader-rule: rgb(28 25 20 / 0.12);
+  --reader-chrome: rgb(241 235 222 / 0.92);
+}
+
+[data-reader-theme='sepia'] {
+  color-scheme: light;
+  --reader-bg: #e7d7b8;
+  --reader-sheet: #f6ecd7;
+  --reader-fg: #382a18;
+  --reader-muted: #6b5a42;
+  --reader-link: #8a3d1d;
+  --reader-rule: rgb(56 42 24 / 0.16);
+  --reader-chrome: rgb(231 215 184 / 0.92);
+}
+
+[data-reader-theme='night'] {
+  color-scheme: dark;
+  --reader-bg: #08090c;
+  --reader-sheet: #131519;
+  --reader-fg: #ccd0da;
+  --reader-muted: #8a8f9c;
+  --reader-link: #e08c66;
+  --reader-rule: rgb(204 208 218 / 0.15);
+  --reader-chrome: rgb(8 9 12 / 0.92);
+}
+
+[data-reader-theme='ink'] {
+  color-scheme: dark;
+  --reader-bg: #12100d;
+  --reader-sheet: #1e1b16;
+  --reader-fg: #e9e1d2;
+  --reader-muted: #9d9281;
+  --reader-link: #e0845e;
+  --reader-rule: rgb(233 225 210 / 0.13);
+  --reader-chrome: rgb(18 16 13 / 0.92);
+}
+
+@utility reader-page {
+  background-color: var(--reader-bg);
+  color: var(--reader-fg);
+}
+
+/**
+ * The book's text.
+ *
+ * The markup arrives sanitised with the publisher's stylesheet stripped, so
+ * this is both the app's typography and the book's. It follows what Foliate
+ * injects into every EPUB — a 1.5 line height, justified lines, automatic
+ * hyphenation, balanced headings — and supplies the one structural default an
+ * EPUB stylesheet would otherwise provide: paragraphs run on with a first-line
+ * indent, and the first paragraph of a run starts flush. That is what turns a
+ * list of web paragraphs into the rhythm of printed text.
+ *
+ * The size is fixed on purpose. Pages are cut from this measure, so a reader's
+ * font size would refit every page against their hand instead of the book.
+ */
+@utility reader-prose {
+  font-size: 17px;
+  line-height: 1.5;
+  font-family: var(--reader-font, Georgia, 'Times New Roman', serif);
+  color: var(--reader-fg);
+  hanging-punctuation: allow-end last;
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+  /* Foliate's rule: a long URL should wrap onto a page rather than be clipped. */
+  overflow-wrap: break-word;
+
+  & p {
+    margin: 0;
+    text-indent: 0;
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+    orphans: 2;
+    widows: 2;
+  }
+
+  /* A printed book does not separate every paragraph with a blank line — the
+     indent is the break. Only a paragraph that follows another gets it. */
+  & p + p {
+    text-indent: 1.5em;
+  }
+
+  /* A paragraph that follows anything other than another paragraph opens a new
+     run, so it starts flush, like the first paragraph of a chapter. */
+  & :is(h1, h2, h3, h4, h5, h6, blockquote, ul, ol, dl, figure, hr, pre, table, figcaption, .reader-note) + p {
+    text-indent: 0;
+  }
+
+  & :is(blockquote, li, dd, figcaption) p {
+    text-indent: 0;
+  }
+
+  & :is(h1, h2, h3, h4, h5, h6) {
+    margin: 1.6em 0 0.9em;
+    font-family: var(--reader-font-heading, var(--reader-font, Georgia, serif));
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    text-indent: 0;
+    text-wrap: balance;
+    break-after: avoid;
+    color: var(--reader-fg);
+  }
+
+  & h1 {
+    font-size: 1.55em;
+    letter-spacing: -0.01em;
+  }
+
+  & h2 {
+    font-size: 1.3em;
+  }
+
+  & h3 {
+    font-size: 1.12em;
+    margin-block-start: 1.4em;
+  }
+
+  & :is(h4, h5, h6) {
+    font-size: 1em;
+  }
+
+  /* The heading that opens a section is already at the top of its page; it does
+     not need a margin's worth of blank paper above it. */
+  & > :first-child,
+  & [data-reader-content] > :first-child,
+  & [data-reader-content] > div > :first-child {
+    margin-block-start: 0;
+  }
+
+  /* The machine-translation notice is part of the page, not the book. */
+  & > .reader-note {
+    margin: 0 0 1.6em;
+    padding-block: 0.4em;
+    padding-inline-start: 0.85em;
+    font-size: 0.82em;
+    line-height: 1.45;
+    text-indent: 0;
+    text-align: start;
+    color: var(--reader-muted);
+  }
+
+  & :is(img, figure, blockquote, pre, table) {
+    break-inside: avoid;
+  }
+
+  & blockquote {
+    margin: 1em 2em;
+    font-style: italic;
+    color: var(--reader-muted);
+  }
+
+  & q {
+    font-style: italic;
+  }
+
+  & :is(ul, ol) {
+    margin: 1em 0;
+    padding-inline-start: 2em;
+  }
+
+  & ul {
+    list-style: disc;
+  }
+
+  & ol {
+    list-style: decimal;
+  }
+
+  & li + li {
+    margin-block-start: 0.3em;
+  }
+
+  & li > p {
+    text-align: start;
+  }
+
+  & dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.35em 1em;
+  }
+
+  & dt {
+    font-weight: 650;
+  }
+
+  & dd {
+    margin: 0;
+    color: var(--reader-muted);
+  }
+
+  & a {
+    color: var(--reader-link);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: from-font;
+  }
+
+  & img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0.8em auto;
+    border-radius: 2px;
+    /* EPUBs put plate captions in alt text; keep them quiet. */
+    font-size: 0.82em;
+    color: var(--reader-muted);
+  }
+
+  & figure {
+    margin: 1em 0;
+  }
+
+  & figcaption {
+    margin-block-start: 0.6em;
+    font-size: 0.82em;
+    text-align: center;
+    color: var(--reader-muted);
+  }
+
+  & hr {
+    width: 4rem;
+    margin: 1.6em auto;
+    border: 0;
+    border-block-start: 1px solid var(--reader-rule);
+  }
+
+  & pre {
+    overflow-x: auto;
+    padding: 0.9em 1.1em;
+    border-radius: 2px;
+    background-color: var(--reader-rule);
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    line-height: 1.55;
+    text-align: start;
+  }
+
+  & code,
+  & kbd,
+  & samp {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+
+  & table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92em;
+  }
+
+  & th,
+  & td {
+    padding: 0.4em 0.6em;
+    border-block-end: 1px solid var(--reader-rule);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  & th {
+    font-weight: 650;
+  }
+
+  & small {
+    font-size: 0.85em;
+    color: var(--reader-muted);
+  }
+
+  & sub,
+  & sup {
+    font-size: 0.72em;
+    line-height: 0;
+  }
+
+  & abbr[title] {
+    text-decoration: underline dotted;
+    text-underline-offset: 0.2em;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Paged reading                                                               */
+/*                                                                            */
+/* The stage is the viewport between the two chrome bars, the sheet is the     */
+/* paper it holds, and the leaf is the window onto the article's columns. The  */
+/* article is one spread wide (two pages on a desktop, one on a phone), as     */
+/* tall as the page, and filled column by column: the first two columns are    */
+/* the open book and the rest overflow to the right, where the leaf hides      */
+/* them. A turn slides the article by exactly one spread.                      */
+/*                                                                            */
+/* The sheet and its frame are sized inline from the measured stage — see      */
+/* `epub-reader.tsx` — so the page keeps Foliate's measure limits rather than  */
+/* stretching to whatever the window happens to be.                           */
+/* -------------------------------------------------------------------------- */
+
+.reader-stage {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  overscroll-behavior: none;
+  padding-inline: 8px;
+}
+
+@media (min-width: 640px) {
+  .reader-stage {
+    padding-inline: 16px;
+  }
+}
+
+/* Paper. Height comes from the measured chrome, top and bottom, so the page
+   does not change size when the bars hide. The width, height and frame are
+   inline; the percentages are what the loading state fills. */
+.reader-sheet {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  border-radius: 3px;
+  background-color: var(--reader-sheet);
+  /* A ring rather than a border: the leaf must be exactly the page box, and a
+     1px border would take 2px off it. */
+  box-shadow:
+    0 0 0 1px var(--reader-rule),
+    0 1px 0 rgb(255 255 255 / 0.28) inset,
+    0 30px 60px -36px rgb(0 0 0 / 0.5);
+}
+
+[data-reader-theme='night'] .reader-sheet,
+[data-reader-theme='ink'] .reader-sheet {
+  box-shadow:
+    0 0 0 1px var(--reader-rule),
+    0 1px 0 rgb(255 255 255 / 0.04) inset,
+    0 36px 70px -34px rgb(0 0 0 / 0.75);
+}
+
+.reader-leaf {
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Loading and error states are the one thing in the leaf that may need to
+   scroll; a chapter never does, because it is paginated. */
+.reader-leaf--scroll {
+  overflow-y: auto;
+}
+
+/* The fold between the facing pages, sitting in the middle of the column gap. */
+.reader-gutter {
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--reader-rule) 12%,
+    var(--reader-rule) 88%,
+    transparent
+  );
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* The article is the column container. Its spread width, page height, column
+   count and gutter are set inline from the measured stage. */
+.reader-leaf > .reader-prose {
+  max-width: none;
+  margin: 0;
+  padding-block: 0;
+  box-sizing: border-box;
+  column-fill: auto;
+  overflow: visible;
+}
+
+/* Only after a deliberate turn: a restored position or a resize must land
+   without a slide across half the chapter. */
+.reader-leaf > .reader-prose[data-motion] {
+  transition: transform 240ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reader-leaf > .reader-prose[data-motion] {
+    transition: none;
+  }
+}
+
+/* A plate should fit on the page it opens, not run off the bottom of it. */
+.reader-leaf .reader-prose img {
+  max-height: calc(var(--reader-page-height, 70vh) - 2.5rem);
+  object-fit: contain;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Highlights                                                                */
+/*                                                                            */
+/* Painted through the CSS Custom Highlight API rather than by wrapping the   */
+/* book's markup, so the sanitised HTML stays untouched, the browser's own    */
+/* selection and find-in-page keep working, and nothing React renders can     */
+/* split a highlight. The rules themselves are injected at runtime by         */
+/* `use-reader-highlights`, because this toolchain's CSS parser does not      */
+/* recognise the `::highlight()` pseudo-element yet.                          */
+/* -------------------------------------------------------------------------- */
+
+@keyframes study-slide {
+  from {
+    opacity: 0;
+    transform: translate3d(1.5rem, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The fore-edge marker a highlight leaves in the margin. */
+@keyframes marker-in {
+  from {
+    opacity: 0;
+    transform: scaleX(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
