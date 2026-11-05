@@ -1,7 +1,7 @@
 {
   "name": "voicebook-desktop",
   "productName": "VoiceBook",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "VoiceBook — a self-contained reading and listening library. Desktop edition built with Tauri 2 and Rust.",
   "type": "module",
