@@ -22,7 +22,13 @@ A fast, fully-local desktop library for your EPUBs — built-in reader, chapter 
 curl -fsSL https://raw.githubusercontent.com/vivek-502/voxleaf/main/install.sh | bash
 ```
 
-This downloads the latest portable binary, makes it executable, and leaves it as `./voxleaf`. Run it with `./voxleaf`.
+This downloads the binary to `~/.local/bin/voxleaf`, installs an app icon, and creates a desktop entry at `~/.local/share/applications/voxleaf.desktop` so you can launch VoxLeaf directly from your app launcher.
+
+Add `~/.local/bin` to your PATH to run `voxleaf` from any terminal:
+
+```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+```
 
 ### Linux (manual)
 
