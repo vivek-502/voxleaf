@@ -1,0 +1,54 @@
+[package]
+name = "voxleaf-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "VoxLeaf's domain logic: database, storage, EPUB, narration and the HTTP API."
+
+[lib]
+name = "voxleaf_core"
+path = "src/lib.rs"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+bytes.workspace = true
+rand.workspace = true
+hex.workspace = true
+base64.workspace = true
+sha2.workspace = true
+hmac.workspace = true
+chrono.workspace = true
+futures-util.workspace = true
+urlencoding.workspace = true
+
+rusqlite = { version = "0.37", features = ["bundled"] }
+axum = { version = "0.8", features = ["multipart"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors", "trace"] }
+reqwest = { version = "0.13", default-features = false, features = [
+  "json",
+  "stream",
+  "rustls",
+  "webpki-roots",
+  "gzip",
+] }
+lofty = "0.25"
+zip = { version = "2", default-features = false, features = ["deflate", "time"] }
+quick-xml = "0.38"
+tokio-tungstenite = { version = "0.26", features = ["rustls-tls-webpki-roots"] }
+mime_guess = "2"
+nanoid = "0.4"
+# The EPUB parser reproduces the web app's regex-driven parsing and its
+# lenient HTML rebuild: `regex` ports the `RegExp` patterns from parse.ts,
+# html5ever + RcDom stand in for node-html-parser in sanitize.ts.
+regex = "1"
+html5ever = "0.39"
+markup5ever_rcdom = "0.39"
+
+[dev-dependencies]
+tempfile = "3"
